@@ -1,4 +1,4 @@
 FROM nginx:stable-alpine
 COPY . /usr/share/nginx/php
-EXPOSE 8080
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
